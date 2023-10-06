@@ -10,7 +10,7 @@ provider:
   region: us-east-2
   memorySize: 2048
   logRetentionInDays: 1
-  timeout: 15
+  timeout: 30
 
 functions:
   api:
