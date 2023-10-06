@@ -10,5 +10,8 @@ import { Cat, CatSchema } from 'src/schemas/cat.schema';
   imports: [MongooseModule.forFeature([{ name: Cat.name, schema: CatSchema }])],
   controllers: [CatsController],
   providers: [CatsService],
+  exports: [
+    MongooseModule
+  ]
 })
 export class CatsModule {}

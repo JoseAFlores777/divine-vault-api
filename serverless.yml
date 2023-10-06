@@ -6,7 +6,7 @@ provider:
   name: aws
   runtime: nodejs18.x
   architecture: arm64
-  stage: production
+  stage: prod
   region: us-east-2
   memorySize: 1024
   logRetentionInDays: 1
@@ -16,9 +16,9 @@ functions:
   api:
     handler: dist/lambda.handler
     events:
-      - httpApi:
-         method: any
-         path: /{proxi+}
+      - http:
+          method: ANY
+          path: '{proxy+}'
 
 plugins:
   - serverless-jetpack
