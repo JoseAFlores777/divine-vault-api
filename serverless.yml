@@ -24,3 +24,7 @@ plugins:
   - serverless-jetpack
   - serverless-offline
   - serverless-plugin-optimize
+
+custom:
+    optimize:
+        external: ['swagger-ui-dist']

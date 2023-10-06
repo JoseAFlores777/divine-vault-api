@@ -7,6 +7,9 @@ import { eventContext } from 'aws-serverless-express/middleware';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
+import { INestApplication } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import setupSwagger from './config/swagger.config';
 
 const express = require('express');
 
@@ -18,18 +21,50 @@ const binaryMimeTypes: string[] = [];
 
 let cachedServer: Server;
 
+// async function bootstrapServer(): Promise<Server> {
+//  if (!cachedServer) {
+//     const expressApp = express();
+//     const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(expressApp))
+//     nestApp.use(eventContext());
+//     await nestApp.init();
+//     cachedServer = createServer(expressApp, undefined, binaryMimeTypes);
+//  }
+//  return cachedServer;
+// }
+
+// export const handler: Handler = async (event: any, context: Context) => {
+//  cachedServer = await bootstrapServer();
+//  return proxy(cachedServer, event, context, 'PROMISE').promise;
+// }
+
+
 async function bootstrapServer(): Promise<Server> {
- if (!cachedServer) {
-    const expressApp = express();
-    const nestApp = await NestFactory.create(AppModule, new ExpressAdapter(expressApp))
-    nestApp.use(eventContext());
-    await nestApp.init();
-    cachedServer = createServer(expressApp, undefined, binaryMimeTypes);
- }
- return cachedServer;
+  if (!cachedServer) {
+    try {
+      const expressApp = express();
+      const nestApp = await NestFactory.create(
+        AppModule,
+        new ExpressAdapter(expressApp),
+      );
+      nestApp.use(eventContext());
+      // Enable Swagger
+      setupSwagger(nestApp);
+      await nestApp.init();
+      cachedServer = createServer(expressApp, undefined, binaryMimeTypes);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+  return cachedServer;
 }
 
 export const handler: Handler = async (event: any, context: Context) => {
- cachedServer = await bootstrapServer();
- return proxy(cachedServer, event, context, 'PROMISE').promise;
-}
+  if (event.path === '/api') {
+    event.path = '/api/';
+  }
+  event.path = event.path.includes('swagger-ui')
+    ? `/api${event.path}`
+    : event.path;
+  cachedServer = await bootstrapServer();
+  return proxy(cachedServer, event, context, 'PROMISE').promise;
+};
