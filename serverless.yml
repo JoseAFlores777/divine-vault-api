@@ -10,7 +10,7 @@ provider:
   region: us-east-2
   memorySize: 1024
   logRetentionInDays: 1
-  timeout: 30
+  timeout: 60
 
 functions:
   api:
@@ -23,3 +23,4 @@ functions:
 plugins:
   - serverless-jetpack
   - serverless-offline
+  - serverless-plugin-optimize
