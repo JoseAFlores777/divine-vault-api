@@ -3,8 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { CatsModule } from './cats/cats.module';
+import { AuthModule } from './auth/auth.module';
 import { EnvConfiguration } from './config/env.config';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { EnvConfiguration } from './config/env.config';
       rootPath: join(__dirname, '..', 'public'),
     }),
     MongooseModule.forRoot(process.env.MONGO_URI),
-    CatsModule,
+    AuthModule,
+    UserModule,
   ],
 })
 export class AppModule {}
