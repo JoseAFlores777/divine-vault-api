@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "sls-offline": "nest build && sls offline start"
+    "sls-offline": "nest build && sls offline start",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -32,7 +33,9 @@
     "@vendia/serverless-express": "^4.10.4",
     "aws-lambda": "^1.0.7",
     "aws-serverless-express": "^3.4.0",
+    "axios": "^1.5.1",
     "joi": "^17.11.0",
+    "lint-staged": "^14.0.1",
     "mongoose": "^7.5.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
@@ -52,8 +55,10 @@
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
     "jest": "^29.5.0",
-    "prettier": "^3.0.0",
+    "organize-imports-cli": "^0.10.0",
+    "prettier": "3.0.3",
     "serverless-jetpack": "^0.11.2",
     "serverless-offline": "^13.2.0",
     "serverless-plugin-optimize": "^4.2.1-rc.1",
