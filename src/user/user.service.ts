@@ -5,7 +5,8 @@ import { Model } from 'mongoose';
 import { LoginDTO } from '../auth/dto/login.dto';
 import { ErrorHandlerService } from '../common/services/errorHandler.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User, UserDocument } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -33,12 +34,33 @@ export class UserService {
     }
   }
 
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserDocument> {
+    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+  }
+
   findAll() {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findByUsernameAndEmail(userData: LoginDTO) {
+    const { username, email } = userData;
+    const user = await this.userModel.findOne({
+      $or: [{ username }, { email }],
+    });
+
+    if (!user) {
+      throw new ConflictException(`The user does not exists`);
+    }
+
+    return user;
+  }
+
+  async findById(UserId: string) {
+    const user = await this.userModel.findById(UserId);
+    if (!user) {
+      throw new BadRequestException('user doestn exists');
+    }
+    return user;
   }
 
   async findByLogin(UserDTO: LoginDTO) {
@@ -63,6 +85,9 @@ export class UserService {
   sanitizeUser(user: User) {
     const sanitized = user.toObject();
     delete sanitized['password'];
+    delete sanitized['createdAt'];
+    delete sanitized['updatedAt'];
+    delete sanitized['__v'];
     return sanitized;
   }
 

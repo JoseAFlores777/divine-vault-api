@@ -32,4 +32,7 @@ export class CreateUserDto {
   @IsOptional()
   @Transform(({ value }) => new Date(value))
   updatedAt: Date;
+
+  @IsOptional()
+  refreshToken: string;
 }
