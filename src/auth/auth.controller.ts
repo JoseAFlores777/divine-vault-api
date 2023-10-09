@@ -31,34 +31,4 @@ export class AuthController {
     const refreshToken = req['user']['refreshToken'];
     return this.authService.refreshTokens(userId, refreshToken);
   }
-
-  //   @Post('register')
-  //   async register(@Body() registerDTO: RegisterDTO) {
-  //     const user = await this.userService.create({ ...registerDTO });
-
-  //     return { user };
-  //   }
-
-  //   @Post('login')
-  //   async login(@Body() loginDTO: LoginDTO) {
-  //     const user = await this.userService.findByLogin(loginDTO);
-  //     const payload = {
-  //       email: user.email,
-  //     };
-  //     const token = await this.authService.signPayload(payload);
-  //     return { user, token };
-  //   }
-
-  //   @Get("/onlyauth")
-  //   @UseGuards(AuthGuard("jwt"))
-
-  //    async hiddenInformation(){
-  //      return  "hidden information";
-  //    }
-
-  //  @Get("/anyone")
-
-  //  async publicInformation(){
-  //  return  "this can be seen by anyone";
-  //  }
 }

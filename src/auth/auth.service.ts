@@ -2,7 +2,6 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
@@ -11,36 +10,27 @@ import { RegisterDTO } from './dto/register.dto';
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private jwtService: JwtService,
-    private configService: ConfigService
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService
   ) {}
-
-  // async signPayload(payload: any) {
-  //   return sign(payload, process.env.SECRET_KEY, { expiresIn: '7d' });
-  // }
-
-  // async validateUser(payload: any) {
-  //   console.log({payload});
-  //   return await this.userService.findByPayload(payload);
-  // }
 
   async signUp(registerDTO: RegisterDTO): Promise<any> {
     const newUser = await this.userService.create({ ...registerDTO });
-
     const tokens = await this.getTokens(newUser._id, newUser.username);
     await this.updateRefreshToken(newUser._id, tokens.refreshToken);
     return { user: newUser, tokens };
   }
 
   async signIn(data: LoginDTO) {
-    // Check if user exists
-    const user = await this.userService.findByUsernameAndEmail(data);
-
+    if (!data.email && !data.username) {
+      throw new BadRequestException('you need set a email or username');
+    }
+    const user = await this.userService.findByUsernameAndEmail(data.username, data.email);
     const passwordMatches = await bcrypt.compare(data.password, user.password);
     if (!passwordMatches) throw new BadRequestException('Password is incorrect');
     const tokens = await this.getTokens(user._id, user.username);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
-    return { user: this.sanitizeUser(user), tokens };
+    return { user: this.userService.sanitizeUser(user), tokens };
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {
@@ -93,14 +83,5 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.username);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
-  }
-
-  sanitizeUser(user: User) {
-    const sanitized = user.toObject();
-    delete sanitized['password'];
-    delete sanitized['createdAt'];
-    delete sanitized['updatedAt'];
-    delete sanitized['__v'];
-    return sanitized;
   }
 }

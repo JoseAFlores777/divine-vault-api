@@ -8,7 +8,7 @@ export class LoginDTO {
   username: string;
 
   @IsEmail()
-  @IsNotEmpty()
+  @IsOptional()
   email: string;
 
   @IsString()
