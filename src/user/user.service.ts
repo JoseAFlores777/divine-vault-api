@@ -62,7 +62,7 @@ export class UserService {
     delete sanitized['password'];
     delete sanitized['createdAt'];
     delete sanitized['updatedAt'];
-    delete sanitized['refreshToken'];
+
     delete sanitized['__v'];
     return sanitized;
   }

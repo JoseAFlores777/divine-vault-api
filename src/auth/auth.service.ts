@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
-import { LoginDTO } from './dto/login.dto';
+import { LoginRequestDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
 
 @Injectable()
@@ -21,16 +21,16 @@ export class AuthService {
     return { user: newUser, tokens };
   }
 
-  async signIn(data: LoginDTO) {
+  async signIn(data: LoginRequestDTO) {
     if (!data.email && !data.username) {
-      throw new BadRequestException('you need set a email or username');
+      throw new BadRequestException('You need to set an email or username.');
     }
     const user = await this.userService.findByUsernameAndEmail(data.username, data.email);
     const passwordMatches = await bcrypt.compare(data.password, user.password);
     if (!passwordMatches) throw new BadRequestException('Password is incorrect');
     const tokens = await this.getTokens(user._id, user.username);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
-    return { user: this.userService.sanitizeUser(user), tokens };
+    return { user, tokens };
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {

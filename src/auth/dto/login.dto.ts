@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
-export class LoginDTO {
+export class LoginRequestDTO {
   @Transform(({ value }) => value.trim())
   @IsString()
   @IsOptional()
