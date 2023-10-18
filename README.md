@@ -44,7 +44,7 @@ yarn install
 Install NestJs CLI
 
 ```bash
-  sudo npm i -g @nestjs/cli
+sudo npm i -g @nestjs/cli
 ```
 
 <br><br>

@@ -1,9 +1,16 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { MongoError } from 'mongodb';
 
 @Injectable()
 export class ErrorHandlerService {
+  private readonly logger = new Logger(ErrorHandlerService.name);
   handleError(error: MongoError | any): void {
+    this.logger.error(error);
     switch (error.code) {
       case 11000:
         throw new BadRequestException(
@@ -16,7 +23,6 @@ export class ErrorHandlerService {
       case 121:
         throw new BadRequestException('Duplicate key error (deprecated).');
       default:
-        console.error(error);
         throw new InternalServerErrorException(
           'An error occurred while processing the request. Check the logs for details.'
         );
