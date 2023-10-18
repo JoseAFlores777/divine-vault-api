@@ -2,9 +2,12 @@ import { BadRequestException, ConflictException, Injectable } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ErrorHandlerService } from '../common/services/errorHandler.service';
-
-import { CreateUserDto_request, CreateUserDto_response } from './dto/create-user.dto';
-import { UpdateUserDto_request, UpdateUserDto_response } from './dto/update-user.dto';
+import {
+  CreateUserDto_request,
+  CreateUserDto_response,
+  UpdateUserDto_request,
+  UpdateUserDto_response,
+} from './dto';
 import { User, UserDocument } from './entities/user.entity';
 
 @Injectable()
@@ -38,14 +41,18 @@ export class UserService {
     id: string,
     updateUserDto_request: UpdateUserDto_request
   ): Promise<UpdateUserDto_response> {
-    const response = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto_request, { new: true })
-      .exec();
+    let response;
+    try {
+      response = await this.userModel
+        .findByIdAndUpdate(id, updateUserDto_request, { new: true })
+        .exec();
+    } catch (error) {
+      this.errorHandlerService.handleError(error);
+    }
 
     if (!response) {
       throw new ConflictException(`The user does not exists`);
     }
-
     return new UpdateUserDto_response(response);
   }
 

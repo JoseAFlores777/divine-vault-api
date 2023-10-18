@@ -1,7 +1,8 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
-import { Tokens } from 'src/auth/dto/tokens.dto';
-import { SanitizedUserDto_response } from '../../user/dto/sanitized-user.dto';
+
+import { SanitizedUserDto_response } from 'src/user/dto';
+import { Tokens } from './tokens.dto';
 
 export class LoginDTO_request {
   @Transform(({ value }) => value.trim())

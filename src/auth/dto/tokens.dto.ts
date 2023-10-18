@@ -1,4 +1,4 @@
-import { SanitizedUserDto_response } from 'src/user/dto/sanitized-user.dto';
+import { SanitizedUserDto_response } from 'src/user/dto';
 
 export class Tokens {
   accessToken: string;

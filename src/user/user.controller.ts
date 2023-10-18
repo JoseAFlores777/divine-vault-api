@@ -9,8 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ParseObjectIdPipe } from '../common/pipes/ParseObjectIdPipe';
-import { CreateUserDto_request } from './dto/create-user.dto';
-import { UpdateUserDto_request } from './dto/update-user.dto';
+import { CreateUserDto_request, UpdateUserDto_request } from './dto';
 import { UserService } from './user.service';
 
 @UseInterceptors(ClassSerializerInterceptor)

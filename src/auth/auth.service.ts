@@ -2,12 +2,18 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { RefreshToken_response, Tokens } from 'src/auth/dto/tokens.dto';
-import { CreateUserDto_response } from 'src/user/dto/create-user.dto';
-import { SanitizedUserDto_response } from 'src/user/dto/sanitized-user.dto';
+
 import { UserService } from '../user/user.service';
-import { LoginDTO_request, LoginDTO_response } from './dto/login.dto';
-import { RegisterDTO_request, RegisterDTO_response } from './dto/register.dto';
+
+import { CreateUserDto_response, SanitizedUserDto_response } from 'src/user/dto';
+import {
+  LoginDTO_request,
+  LoginDTO_response,
+  RefreshToken_response,
+  RegisterDTO_request,
+  RegisterDTO_response,
+  Tokens,
+} from './dto';
 
 @Injectable()
 export class AuthService {
