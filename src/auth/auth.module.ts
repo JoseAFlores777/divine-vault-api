@@ -6,10 +6,17 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AccessTokenStrategy } from './strategies/accessToken.strategy';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
+import { VerifyAccessService } from './verify-access.service';
 
 @Module({
   imports: [UserModule, JwtModule.register({})],
   controllers: [AuthController],
-  providers: [ConfigService, AuthService, AccessTokenStrategy, RefreshTokenStrategy],
+  providers: [
+    ConfigService,
+    AuthService,
+    VerifyAccessService,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+  ],
 })
 export class AuthModule {}

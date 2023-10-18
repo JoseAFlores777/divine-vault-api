@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
-import { SanitizedUserDto_response } from './sanitized-user.dto';
+import { UserDocument } from '../entities/user.entity';
 
 export class CreateUserDto_request {
   @Transform(({ value }) => value.trim())
@@ -38,4 +38,4 @@ export class CreateUserDto_request {
   refreshToken: string;
 }
 
-export class CreateUserDto_response extends SanitizedUserDto_response {}
+export type CreateUserDto_response = UserDocument;

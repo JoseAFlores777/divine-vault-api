@@ -5,10 +5,11 @@ import { ErrorHandlerService } from '../common/services/errorHandler.service';
 import {
   CreateUserDto_request,
   CreateUserDto_response,
+  InternalUserSearchDto_response,
   UpdateUserDto_request,
   UpdateUserDto_response,
 } from './dto';
-import { User, UserDocument } from './entities/user.entity';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,7 @@ export class UserService {
     try {
       const createdUser = new this.userModel(createUserDto);
       await createdUser.save();
-      return new CreateUserDto_response(createdUser);
+      return createdUser;
     } catch (error) {
       this.errorHandlerService.handleError(error);
     }
@@ -56,7 +57,10 @@ export class UserService {
     return new UpdateUserDto_response(response);
   }
 
-  async findByUsernameAndEmail(username: string, email: string): Promise<UserDocument> {
+  async findByUsernameAndEmail(
+    username: string,
+    email: string
+  ): Promise<InternalUserSearchDto_response> {
     const user = await this.userModel.findOne({
       $or: [{ username }, { email }],
     });
@@ -68,7 +72,7 @@ export class UserService {
     return user;
   }
 
-  async findById(UserId: string) {
+  async findById(UserId: string): Promise<InternalUserSearchDto_response> {
     const user = await this.userModel.findById(UserId);
     if (!user) {
       throw new BadRequestException('user doestn exists');
