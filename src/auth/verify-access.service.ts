@@ -1,7 +1,8 @@
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+
+import * as bcrypt from 'bcryptjs';
 import { SanitizedUserDto_response } from 'src/user/dto';
 import { UserDocument } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
