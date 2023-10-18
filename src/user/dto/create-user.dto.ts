@@ -1,7 +1,8 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import { SanitizedUserDto_response } from './sanitized-user.dto';
 
-export class CreateUserDto {
+export class CreateUserDto_request {
   @Transform(({ value }) => value.trim())
   @IsString()
   @Length(4, 20)
@@ -36,3 +37,5 @@ export class CreateUserDto {
   @IsOptional()
   refreshToken: string;
 }
+
+export class CreateUserDto_response extends SanitizedUserDto_response {}

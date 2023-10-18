@@ -2,9 +2,12 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { RefreshToken_response, Tokens } from 'src/auth/dto/tokens.dto';
+import { CreateUserDto_response } from 'src/user/dto/create-user.dto';
+import { SanitizedUserDto_response } from 'src/user/dto/sanitized-user.dto';
 import { UserService } from '../user/user.service';
-import { LoginRequestDTO } from './dto/login.dto';
-import { RegisterDTO } from './dto/register.dto';
+import { LoginDTO_request, LoginDTO_response } from './dto/login.dto';
+import { RegisterDTO_request, RegisterDTO_response } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,14 +17,14 @@ export class AuthService {
     private readonly configService: ConfigService
   ) {}
 
-  async signUp(registerDTO: RegisterDTO): Promise<any> {
+  async signUp(registerDTO: RegisterDTO_request): Promise<RegisterDTO_response> {
     const newUser = await this.userService.create({ ...registerDTO });
-    const tokens = await this.getTokens(newUser._id, newUser.username);
-    await this.updateRefreshToken(newUser._id, tokens.refreshToken);
-    return { user: newUser, tokens };
+    const tokens = await this.getTokens(newUser.id, newUser.username);
+    await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+    return new RegisterDTO_response(newUser, tokens);
   }
 
-  async signIn(data: LoginRequestDTO) {
+  async signIn(data: LoginDTO_request) {
     if (!data.email && !data.username) {
       throw new BadRequestException('You need to set an email or username.');
     }
@@ -30,7 +33,8 @@ export class AuthService {
     if (!passwordMatches) throw new BadRequestException('Password is incorrect');
     const tokens = await this.getTokens(user._id, user.username);
     await this.updateRefreshToken(user._id, tokens.refreshToken);
-    return { user, tokens };
+    const verifiedUser = new CreateUserDto_response(user);
+    return new LoginDTO_response(verifiedUser, tokens);
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {
@@ -44,7 +48,7 @@ export class AuthService {
     return bcrypt.hash(data, 10);
   }
 
-  async getTokens(userId: string, username: string) {
+  async getTokens(userId: string, username: string): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
@@ -74,14 +78,14 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
+  async refreshTokens(userId: string, refreshToken: string): Promise<RefreshToken_response> {
     const user = await this.userService.findById(userId);
-    if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied1');
+    if (!user || !user.refreshToken) throw new ForbiddenException('Access Denied');
     const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
 
-    if (!refreshTokenMatches) throw new ForbiddenException('Access Denied2');
+    if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
     const tokens = await this.getTokens(user.id, user.username);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
-    return tokens;
+    return new RefreshToken_response(new SanitizedUserDto_response(user), tokens);
   }
 }

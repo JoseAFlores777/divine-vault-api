@@ -2,8 +2,9 @@ import { BadRequestException, ConflictException, Injectable } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ErrorHandlerService } from '../common/services/errorHandler.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+
+import { CreateUserDto_request, CreateUserDto_response } from './dto/create-user.dto';
+import { UpdateUserDto_request, UpdateUserDto_response } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class UserService {
     private readonly errorHandlerService: ErrorHandlerService
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto_request): Promise<CreateUserDto_response> {
     const { username, email } = createUserDto;
 
     const user = await this.userModel.findOne({
@@ -27,17 +28,28 @@ export class UserService {
     try {
       const createdUser = new this.userModel(createUserDto);
       await createdUser.save();
-      return this.sanitizeUser(createdUser);
+      return new CreateUserDto_response(createdUser);
     } catch (error) {
       this.errorHandlerService.handleError(error);
     }
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserDocument> {
-    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+  async update(
+    id: string,
+    updateUserDto_request: UpdateUserDto_request
+  ): Promise<UpdateUserDto_response> {
+    const response = await this.userModel
+      .findByIdAndUpdate(id, updateUserDto_request, { new: true })
+      .exec();
+
+    if (!response) {
+      throw new ConflictException(`The user does not exists`);
+    }
+
+    return new UpdateUserDto_response(response);
   }
 
-  async findByUsernameAndEmail(username: string, email: string) {
+  async findByUsernameAndEmail(username: string, email: string): Promise<UserDocument> {
     const user = await this.userModel.findOne({
       $or: [{ username }, { email }],
     });
@@ -54,16 +66,6 @@ export class UserService {
     if (!user) {
       throw new BadRequestException('user doestn exists');
     }
-    return this.sanitizeUser(user);
-  }
-
-  sanitizeUser(user: User) {
-    const sanitized = user.toObject();
-    delete sanitized['password'];
-    delete sanitized['createdAt'];
-    delete sanitized['updatedAt'];
-
-    delete sanitized['__v'];
-    return sanitized;
+    return user;
   }
 }
